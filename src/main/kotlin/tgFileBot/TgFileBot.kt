@@ -167,8 +167,10 @@ class TgFileBot {
 
     private fun generateButtons(): List<List<KeyboardButton>> {
         return listOf(
-            listOf(KeyboardButton(text = GIVE_COMMAND)),
-            listOf(KeyboardButton(text = HELP_COMMAND)),
+            listOf(
+                KeyboardButton(text = GIVE_COMMAND),
+                KeyboardButton(text = HELP_COMMAND),
+            ),
         )
     }
 
