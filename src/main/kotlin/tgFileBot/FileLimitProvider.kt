@@ -42,4 +42,8 @@ class FileLimitProvider(
     fun getUserIds(): Set<String> {
         return userIdFileCounts.keys
     }
+
+    fun getUserIdFileCounts(): MutableMap<String, Int> {
+        return userIdFileCounts
+    }
 }

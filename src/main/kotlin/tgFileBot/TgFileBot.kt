@@ -5,10 +5,7 @@ import com.github.kotlintelegrambot.bot
 import com.github.kotlintelegrambot.dispatch
 import com.github.kotlintelegrambot.dispatcher.command
 import com.github.kotlintelegrambot.dispatcher.text
-import com.github.kotlintelegrambot.entities.ChatId
-import com.github.kotlintelegrambot.entities.KeyboardReplyMarkup
-import com.github.kotlintelegrambot.entities.Message
-import com.github.kotlintelegrambot.entities.TelegramFile
+import com.github.kotlintelegrambot.entities.*
 import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
 import com.github.kotlintelegrambot.logging.LogLevel
 import io.github.cdimascio.dotenv.dotenv
@@ -97,7 +94,26 @@ class TgFileBot {
                             log.info { "Sent donate message to ${message.chat.getUserWithId()}" }
                         }
                     } else {
-                        log.info { "User ${message.chat.getUserWithId()} tried to run ask commands" }
+                        log.info { "User ${message.chat.getUserWithId()} tried to run ask command" }
+                    }
+                }
+
+                command("stats") {
+                    if (message.chat.id == adminUserId.toLong()) {
+                        var text = "```\n"
+                        fileLimitProvider.getUserIdFileCounts().forEach { entry ->
+                            text += "${entry.key},${entry.value}\n"
+                        }
+                        text += "```"
+
+                        bot.sendMessage(
+                            chatId = ChatId.fromId(adminUserId.toLong()),
+                            text = text,
+                            parseMode = ParseMode.MARKDOWN,
+                        )
+                        log.info { "Sent stats message to ${message.chat.getUserWithId()}" }
+                    } else {
+                        log.info { "User ${message.chat.getUserWithId()} tried to run stats command" }
                     }
                 }
 
