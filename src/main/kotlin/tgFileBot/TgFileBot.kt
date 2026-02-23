@@ -47,11 +47,21 @@ class TgFileBot {
 
     fun run() {
         fileLimitProvider.init()
-        log.info { "Bot started" }
 
         val dotenv = dotenv()
         telegramToken = dotenv["TOKEN"]
         adminUserId = dotenv["ADMIN_USER_ID"]
+
+        if (telegramToken.isEmpty()) {
+            log.error { "Token not set!" }
+            return
+        }
+        if (adminUserId.isEmpty()) {
+            log.error { "Admin user id not set!" }
+            return
+        }
+
+        log.info { "Bot started" }
 
         val bot = bot {
             token = telegramToken
