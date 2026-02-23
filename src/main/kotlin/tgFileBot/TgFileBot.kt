@@ -11,6 +11,7 @@ import com.github.kotlintelegrambot.entities.Message
 import com.github.kotlintelegrambot.entities.TelegramFile
 import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
 import com.github.kotlintelegrambot.logging.LogLevel
+import io.github.cdimascio.dotenv.dotenv
 import io.github.oshai.kotlinlogging.KotlinLogging
 import tgFileBot.Text.Companion.GIVE_COMMAND
 import tgFileBot.Text.Companion.HELP_COMMAND
@@ -27,8 +28,9 @@ class TgFileBot {
 
     private val config = loadProperties()
 
-    private val telegramToken = config.getProperty("token")
-    private val adminUserId = config.getProperty("adminUserId").toLong()
+    private lateinit var telegramToken: String
+    private lateinit var adminUserId: String
+
     private val filesDirectory = config.getProperty("filesDirectory")
     private val fileLimitsFile = config.getProperty("fileLimitsFile")
     private val fileLimit = config.getProperty("fileLimit").toInt()
@@ -46,6 +48,10 @@ class TgFileBot {
     fun run() {
         fileLimitProvider.init()
         log.info { "Bot started" }
+
+        val dotenv = dotenv()
+        telegramToken = dotenv["TOKEN"]
+        adminUserId = dotenv["ADMIN_USER_ID"]
 
         val bot = bot {
             token = telegramToken
@@ -72,7 +78,7 @@ class TgFileBot {
                 }
 
                 command("ask") {
-                    if (message.chat.id == adminUserId) {
+                    if (message.chat.id == adminUserId.toLong()) {
                         fileLimitProvider.getUserIds().forEach { userId ->
                             bot.sendMessage(
                                 chatId = ChatId.fromId(userId.toLong()),
@@ -103,7 +109,7 @@ class TgFileBot {
                             text = OUT_OF_FILES_MESSAGE,
                         )
                         bot.sendMessage(
-                            chatId = ChatId.fromId(adminUserId),
+                            chatId = ChatId.fromId(adminUserId.toLong()),
                             text = OUT_OF_FILES_ADMIN_MESSAGE,
                         )
                         return@text

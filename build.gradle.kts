@@ -11,6 +11,7 @@ dependencies {
     implementation(libs.bundles.logging)
     implementation(libs.bundles.telegramBot)
     implementation(libs.kotlinx.coroutines)
+    implementation(libs.dotenv)
 
     testImplementation(kotlin("test"))
 }

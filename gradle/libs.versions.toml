@@ -8,6 +8,7 @@ gson = "2.13.2"
 retrofit = "2.12.0"
 kotlin-telegram-bot = "6.3.0"
 kotlinx-coroutines = "1.6.2"
+dotenv = "6.5.1"
 
 [libraries]
 #logging
@@ -23,6 +24,7 @@ retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", v
 kotlin-telegram-bot = { module = "io.github.kotlin-telegram-bot.kotlin-telegram-bot:telegram", version.ref = "kotlin-telegram-bot" }
 
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm", version.ref = "kotlinx-coroutines" }
+dotenv = { module = "io.github.cdimascio:dotenv-kotlin", version.ref = "dotenv" }
 
 [bundles]
 logging = ["logback", "slf4j-api", "kotlin-logging"]
