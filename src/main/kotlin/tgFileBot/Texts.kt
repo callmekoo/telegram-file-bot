@@ -19,7 +19,7 @@ class Text {
                 хелб — показать список команд
             """.trimIndent()
 
-        const val LIMIT_EXCEEDED_MESSAGE = "Лимит в 3 файла исчерпан!"
+        const val LIMIT_EXCEEDED_MESSAGE = "Лимит в 10 файлов исчерпан!"
         const val OUT_OF_FILES_MESSAGE = "Файлы кончились! Напиши тому, кто дал тебе адрес этого бота."
         const val OUT_OF_FILES_ADMIN_MESSAGE = "Файлы кончились! Надо добавить еще."
 
