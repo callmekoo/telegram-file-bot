@@ -46,3 +46,4 @@ bin/
 
 /files/
 /gradle/wrapper/
+.env

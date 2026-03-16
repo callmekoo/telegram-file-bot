@@ -31,7 +31,7 @@ class FileLimitProvider(
 
     fun logLimit(userId: Long, filename: String) {
         userIdFileCounts[userId.toString()] = userIdFileCounts.getOrDefault(key = userId.toString(), defaultValue = 0) + 1
-        dbFile.appendText(listOf(userId, filename).joinToString(separator))
+        dbFile.appendText(listOf(userId, filename).joinToString(separator).plus('\n'))
         log.info { "Log file $filename for $userId" }
     }
 
