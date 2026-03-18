@@ -70,7 +70,7 @@ class TgFileBot {
 
                     val result = bot.sendMessage(
                         chatId = ChatId.fromId(message.chat.id),
-                        text = Text.greetingMessage,
+                        text = Text.getGreetingMessage(fileLimit),
                         replyMarkup = KeyboardReplyMarkup(keyboard = generateButtons(), resizeKeyboard = true),
                     )
 
@@ -153,7 +153,7 @@ class TgFileBot {
 
                     bot.sendMessage(
                         chatId = ChatId.fromId(message.chat.id),
-                        text = Text.availableCommands,
+                        text = Text.getAvailableCommands(fileLimit),
                     )
                 }
             }
