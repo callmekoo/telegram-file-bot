@@ -10,6 +10,7 @@ import com.github.kotlintelegrambot.entities.keyboard.KeyboardButton
 import com.github.kotlintelegrambot.logging.LogLevel
 import io.github.cdimascio.dotenv.dotenv
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.delay
 import tgFileBot.Text.Companion.GIVE_COMMAND
 import tgFileBot.Text.Companion.HELP_COMMAND
 import tgFileBot.Text.Companion.LIMIT_EXCEEDED_MESSAGE
@@ -19,6 +20,7 @@ import tgFileBot.Text.Companion.getUserWithId
 import java.io.File
 import java.io.InputStream
 import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
 
 class TgFileBot {
     private val log = KotlinLogging.logger { }
@@ -84,17 +86,28 @@ class TgFileBot {
                     )
                 }
 
-                command("ask") {
+                command("all") {
                     if (message.chat.id == adminUserId.toLong()) {
+                        val allMessage = args.joinToString()
+                        if (allMessage.isEmpty()) {
+                            bot.sendMessage(
+                                userId = message.chat.id,
+                                text = "There is no text apart from command!",
+                                description = "empty ALL message error",
+                            )
+                            return@command
+                        }
                         fileLimitProvider.getUserIds().forEach { userId ->
                             bot.sendMessage(
-                                chatId = ChatId.fromId(userId.toLong()),
-                                text = "Пожалуйста дайте денежков будьте так добры",
+                                text = allMessage,
+                                userId = userId.toLong(),
+                                description = "ALL message",
                             )
-                            log.info { "Sent donate message to ${message.chat.getUserWithId()}" }
+                            delay(5000.milliseconds)
                         }
+
                     } else {
-                        log.info { "User ${message.chat.getUserWithId()} tried to run ask command" }
+                        log.info { "User ${message.chat.getUserWithId()} tried to run ALL command" }
                     }
                 }
 
@@ -107,11 +120,11 @@ class TgFileBot {
                         text += "```"
 
                         bot.sendMessage(
-                            chatId = ChatId.fromId(adminUserId.toLong()),
+                            userId = adminUserId.toLong(),
                             text = text,
                             parseMode = ParseMode.MARKDOWN,
+                            description = "stats message",
                         )
-                        log.info { "Sent stats message to ${message.chat.getUserWithId()}" }
                     } else {
                         log.info { "User ${message.chat.getUserWithId()} tried to run stats command" }
                     }
@@ -122,8 +135,9 @@ class TgFileBot {
 
                     if (fileLimitProvider.isLimitExceeded(message.chat.id)) {
                         bot.sendMessage(
-                            chatId = ChatId.fromId(message.chat.id),
+                            userId = message.chat.id,
                             text = LIMIT_EXCEEDED_MESSAGE,
+                            description = "limits exceeded message",
                         )
                         return@text
                     }
@@ -131,12 +145,14 @@ class TgFileBot {
                     val file = fileProvider.tryGetFile()
                     if (file == null) {
                         bot.sendMessage(
-                            chatId = ChatId.fromId(message.chat.id),
+                            userId = message.chat.id,
                             text = OUT_OF_FILES_MESSAGE,
+                            description = "out of files message",
                         )
                         bot.sendMessage(
-                            chatId = ChatId.fromId(adminUserId.toLong()),
+                            userId = adminUserId.toLong(),
                             text = OUT_OF_FILES_ADMIN_MESSAGE,
+                            description = "out of files message",
                         )
                         return@text
                     }
@@ -152,14 +168,27 @@ class TgFileBot {
                     }
 
                     bot.sendMessage(
-                        chatId = ChatId.fromId(message.chat.id),
                         text = Text.getAvailableCommands(fileLimit),
+                        userId = message.chat.id,
+                        description = "help message",
                     )
                 }
             }
         }
 
         bot.startPolling()
+    }
+
+    private fun Bot.sendMessage(text: String, userId: Long, parseMode: ParseMode? = null, description: String) {
+        val result = this.sendMessage(
+            chatId = ChatId.fromId(userId),
+            text = text,
+            parseMode = parseMode,
+        )
+        result.fold(
+            ifSuccess = { log.info { "Sent $description to $userId" } },
+            ifError = { log.info { "Failed to send $description to $userId" } },
+        )
     }
 
     private fun Bot.sendFile(message: Message, file: File) {
